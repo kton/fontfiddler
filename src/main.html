@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <style type="text/css">
+  html {
+    overflow-y:scroll;
+  }
+  html, body {
+    margin:0;
+    padding:0;
+  }
+  #previewTextSidebar {
+    position:fixed;
+    margin-top:40px;
+    padding:10px;
+    background:black;
+    z-index: 1002;
+  }
+  #previewTextSidebar select {
+    width:170px;
+  }
+  #previewTextSidebar button {
+    margin:15px 5px 5px 5px;
+  }
+  #previewTextControls {
+    position:fixed;
+    display:block;
+    width:100%;
+    height:40px;
+    background:url('logo.png') no-repeat top left black;
+    color:white;
+    z-index:1001;
+    border-bottom:3px solid white;
+    text-indent:200px
+  }
+  #previewTextControls span {
+    margin:auto 15px;
+  }
+  #previewTextControls input {
+    margin:10px 15px;
+    vertical-align:middle;
+  }
+  #previewTextPane {
+    padding-top:50px;
+  }
+  #previewTextPane ul {
+    margin:0;
+    padding:0 0 0 200px;
+  }
+  #previewTextPane ul li {
+    height:170px;
+    overflow:hidden;
+  }
+  #previewTextPane ul li .fontHeader {
+    margin-top:-15px;
+    display:block;
+    width:100%;
+    height:25px;
+    background:black;
+    font:10pt sans-serif;
+  }
+  #previewTextPane ul li .fontHeader span:first-child {
+    background:white;
+    float:left;
+    color:black;
+    padding:4px 10px;
+    border:1px solid black;
+    font-weight:bold;
+  }
+  #previewTextPane ul li .fontHeader span:not(:first-child) {
+    float:right;
+    margin:auto 5px;
+    color:white;
+    padding:5px 12px;
+  }
+  #previewTextPane ul li p {
+    vertical-align:middle;
+    height:155px;
+    display:table-cell;
+    margin:auto 0;
+    white-space:nowrap;
+  }
+  .fontTagger {
+    margin-top:-15px;
+    position:absolute;
+    right:0;
+    padding-top:35px;
+    padding-right:20px;
+    height:135px;
+    text-align:right;
+    width:100%;
+  }
+  .fontTagger button {
+    visibility:hidden;
+    margin-left:10px;
+  }
+  .fontTagger:hover button {
+    visibility:visible;
+  }
+  .bold { font-weight: bold }
+  .italic { font-style: italic}
+  .underline {text-decoration:underline}
+  </style>
+  <script src="react-0.13.3.min.js"></script>
+</head>
+<body>
+  <script src="main.js"></script>
+</body>
+</html>

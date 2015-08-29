@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--
+this is used to open a new tab with the main interface
+rather than chrome.browserAction.onClicked.addListener(displayTab)
+
+why? because a background script with "persistent": false
+still lingers in memory after the extension ui is unloaded
+
+using an interstitial popup.html + popup.js allows the
+extension to be immediately freed from memory after it is closed
+-->
+<script src="popup.js"></script>
+</head>
+<body style="width:300px">
+Oops! FontFiddler couldn't display itself right away.<br>
+<br>
+If you're browsing incognito, check a non-incognito window for FontFiddler.
+</body>
+</html>
