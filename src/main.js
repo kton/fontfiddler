@@ -221,7 +221,7 @@ var FontFiddler = React.createClass({
           React.createElement(
             'optgroup',
             { label: 'Tags' },
-            (!!this.state.data.tags && !!this.state.data.tags.length) > 0 && this.state.data.tags.map(function (tag) {
+            !!this.state.data.tags && !!this.state.data.tags.length > 0 && this.state.data.tags.map(function (tag) {
               return React.createElement(
                 'option',
                 { value: tag },
