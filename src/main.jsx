@@ -10,38 +10,46 @@ var FontFiddler = React.createClass({
       previewFontBold: false,
       previewFontItalic: false,
       previewFontUnderline: false,
-      presets: {
-        serif: [],
-        sansserif: [],
-        monospace: [],
-        script: []
-      },
       data: {
         tags: [],
         tagged: {}
       }
     };
   },
+
   componentDidMount: function() {
     if (this.isMounted()) {
       var that = this;
+
       chrome.fontSettings.getFontList(function(_fonts) {
         that.setState({allfonts: _fonts, fonts: _fonts});
       });
+
       chrome.storage.local.get('tags', function(_tags) {
         if (_tags['tags'] && _tags['tags'].length > 0) {
-          that.state.data.tags = _tags['tags'];
+          that.setState({
+            data: {
+              tags: _tags['tags'],
+              tagged: that.state.data.tagged
+            }
+          });
         }
-        that.forceUpdate();
       });
+
       chrome.storage.local.get('tagged', function(_tagged) {
         if (_tagged['tagged'] && Object.keys(_tagged['tagged']).length !== 0) {
-          that.state.data.tagged = _tagged['tagged'];
+          that.setState({
+            data: {
+              tags: that.state.data.tags,
+              tagged: _tagged['tagged']
+            }
+          });
         }
-        that.forceUpdate();
       });
+
     }
   },
+
   handleChange: function(event) {
     var that = this;
 
@@ -73,9 +81,9 @@ var FontFiddler = React.createClass({
             return font['displayName'].toLowerCase().indexOf(text.toLowerCase()) > -1;
           });
 
-          this.state.fonts = matchedFonts;
+          this.setState({fonts: matchedFonts});
         } else {
-          this.state.fonts = matched;
+          this.setState({fonts: matched});
         }
 
       } else {
@@ -85,39 +93,49 @@ var FontFiddler = React.createClass({
             return font['displayName'].toLowerCase().indexOf(text.toLowerCase()) > -1;
           });
 
-          this.state.fonts = matchedFonts;
+          this.setState({fonts: matchedFonts});
         } else {
-          this.state.fonts = this.state.allfonts;
+          this.setState({fonts: this.state.allfonts});
         }
-        
+
       }
 
-      this.forceUpdate();
     }
   },
   handleToggle: function(event) {
     var origin = event.target.id;
-    this.state[origin] = !this.state[origin];
-    this.forceUpdate();
+    var state = {};
+    state[origin] = !this.state[origin];
+    this.setState(state);
   },
+
   handleTag: function(event) {
     var origin = event.target.id;
+
+    // clone this.state.data so that we don't mutate it directly
+    var _data = {};
+    _data.tags = this.state.data.tags.slice();
+    _data.tagged = {};
+
+    for (var font in this.state.data.tagged) {
+      _data.tagged[font] = this.state.data.tagged[font].slice();
+    }
 
     if (origin === 'addTag' || origin === 'removeTag') {
       var promptText = 'Enter a tag name';
       if (origin === 'addTag') { promptText += ' to add'; }
       if (origin === 'removeTag') { promptText += ' to remove'; }
-      
+
       var tag = window.prompt(promptText);
 
       if (tag && tag.length > 0) {
-        var index = this.state.data.tags.indexOf(tag);
-        
+        var index = _data.tags.indexOf(tag);
+
         if (origin === 'addTag' && index === -1) {
-          this.state.data.tags.push(tag);
+          _data.tags.push(tag);
         } else
         if (origin === 'removeTag' && index !== -1) {
-          this.state.data.tags.splice(index, 1);
+          _data.tags.splice(index, 1);
         }
       }
 
@@ -126,73 +144,81 @@ var FontFiddler = React.createClass({
       var fontId = event.target.value;
 
       if (tag && fontId) {
-        if (!this.state.data.tagged[fontId]) {
-          this.state.data.tagged[fontId] = [];
+        if (!_data.tagged[fontId]) {
+          _data.tagged[fontId] = [];
         }
 
-        var index = this.state.data.tagged[fontId].indexOf(tag);
+        var index = _data.tagged[fontId].indexOf(tag);
 
         if (index === -1) {
-          this.state.data.tagged[fontId].push(tag);
+          _data.tagged[fontId].push(tag);
         } else {
-          this.state.data.tagged[fontId].splice(index,1);
+          _data.tagged[fontId].splice(index, 1);
         }
 
-        if (this.state.data.tagged[fontId].length < 1) {
-          delete this.state.data.tagged[fontId];
+        if (_data.tagged[fontId].length < 1) {
+          delete _data.tagged[fontId];
         }
       }
-      // console.log('tagged: ' + JSON.stringify(this.state.data.tagged));
+      // console.log('tagged: ' + JSON.stringify(_data.tagged));
     }
 
-    chrome.storage.local.set(this.state.data);
-    this.forceUpdate();
+    this.setState({data: _data}, function() {
+      chrome.storage.local.set(this.state.data);
+    });
+
   },
+
   handleSelect: function(event) {
     var that = this;
     var options = event.target.querySelectorAll('option');
     var selected = [];
 
-    for (var i=0; i<options.length; i++) {
+    for (var i = 0; i < options.length; i++) {
       if (options[i].selected) {
         selected.push(options[i].value);
       }
     }
 
+    // use callbacks with this.setState, otherwise this.state returns existing value
     if (selected.length === 0 ||
         (selected.length === 1 && selected[0] === 'all')) {
-      this.state.selectedtags = [];
-    } else {
-      this.state.selectedtags = selected;
-    }
-
-    // console.log('selected tags: ' + JSON.stringify(this.state.selectedtags));
-
-    if (this.state.selectedtags.length > 0) {
-      var matched = [];
-
-      this.state.selectedtags.forEach(function(tag) {
-        that.state.allfonts.map(function(font) {
-          if (that.state.data.tagged[font.fontId] &&
-              that.state.data.tagged[font.fontId].indexOf(tag) > -1) {
-            matched.push(font);
-          }
-        });
+      this.setState({selectedtags: []}, function() {
+        that.setState({fonts: that.state.allfonts});
       });
-
-      this.state.fonts = matched;
     } else {
-      this.state.fonts = this.state.allfonts;
+      this.setState({selectedtags: selected}, function() {
+
+        // console.log('selected tags: ' + JSON.stringify(that.state.selectedtags));
+
+        if (that.state.selectedtags.length > 0) {
+          var matched = [];
+
+          that.state.selectedtags.forEach(function(tag) {
+            that.state.allfonts.map(function(font) {
+              if (that.state.data.tagged[font.fontId] &&
+                  that.state.data.tagged[font.fontId].indexOf(tag) > -1) {
+                matched.push(font);
+              }
+            });
+          });
+
+          that.setState({fonts: matched});
+        } else {
+          that.setState({fonts: that.state.allfonts});
+        }
+
+      });
     }
-    
+
     // document.getElementById('previewFontFilter').value = '';
 
     document.getElementById('previewFontFilter').dispatchEvent(
       new Event('change', {'bubbles': true})
     );
 
-    this.forceUpdate();
   },
+
   render: function() {
     var that = this;
     var previewFontStyles = '';
@@ -254,7 +280,7 @@ var FontFiddler = React.createClass({
               <li>Loading your fonts...</li>
             }
 
-            {(!this.state.fonts.length && 
+            {(!this.state.fonts.length &&
               !!this.state.allfonts.length) &&
               <li>No fonts matching your criteria</li>
             }
