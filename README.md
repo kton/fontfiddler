@@ -1,9 +1,9 @@
  Font Fiddler
 -
 
-A React-based Chrome extension for managing local fonts.
+A React-based browser extension for managing local fonts.
 
-Available at the [Chrome web store](https://chrome.google.com/webstore/detail/font-fiddler/jblkljmllcfgpogjgikmeoobhjpomoil).
+Available at the [Chrome web store](https://chrome.google.com/webstore/detail/font-fiddler/jblkljmllcfgpogjgikmeoobhjpomoil) and the [Mozilla add-ons page](https://addons.mozilla.org/en-US/firefox/addon/font-fiddler/).
 
 Features
 -

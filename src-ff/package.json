@@ -1,0 +1,12 @@
+{
+  "title":"Font Fiddler",
+  "name":"fontfiddler",
+  "version": "0.0.2",
+  "description": "A React-based extension to manage local fonts",
+  "main": "main.js",
+  "author": "kton",
+  "engines": {
+    "firefox": ">=38.0a1"
+  },
+  "license": "MIT"
+}
